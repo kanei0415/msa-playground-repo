@@ -1,0 +1,7 @@
+/Users/kanei/Developer/msa-playground-repo/product-service/src/main/java/com/programmingtechie/productservice/dto/ProductRequest.java
+/Users/kanei/Developer/msa-playground-repo/product-service/src/main/java/com/programmingtechie/productservice/controller/ProductController.java
+/Users/kanei/Developer/msa-playground-repo/product-service/src/main/java/com/programmingtechie/productservice/model/Product.java
+/Users/kanei/Developer/msa-playground-repo/product-service/src/main/java/com/programmingtechie/productservice/repository/ProductRepository.java
+/Users/kanei/Developer/msa-playground-repo/product-service/src/main/java/com/programmingtechie/productservice/ProductServiceApplication.java
+/Users/kanei/Developer/msa-playground-repo/product-service/src/main/java/com/programmingtechie/productservice/service/ProductService.java
+/Users/kanei/Developer/msa-playground-repo/product-service/src/main/java/com/programmingtechie/productservice/dto/ProductResponse.java
