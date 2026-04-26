@@ -17,7 +17,7 @@ services:
       - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - CLUSTER_ID=5L6g3nShT-eMCtK--X86sw
-  
+
   zipkin:
     networks:
       - msa-network
@@ -39,7 +39,7 @@ services:
       - SERVER_PORT=8761
     depends_on:
       - zipkin
-  
+
   api-gateway:
     networks:
       - msa-network
@@ -55,18 +55,21 @@ services:
     depends_on:
       - discovery-server
       - zipkin
-  
+
   product-service:
     networks:
       - msa-network
     image: localhost/local/product-service
     container_name: product-service
+    ports:
+      - "8082:8082"
     environment:
       - ZIPKIN_URL=http://zipkin:9411
       - MONGO_DATABASE=productdb
       - MONGO_USER=username
       - MONGO_PASSWORD=password
       - MONGO_HOST=mongo:27017
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka
     depends_on:
       - mongo
       - zipkin
@@ -104,7 +107,7 @@ services:
       - discovery-server
       - kafka
       - zipkin
-      
+
   order-mysql:
     networks:
       - msa-network
@@ -132,12 +135,14 @@ services:
       - discovery-server
       - kafka
       - zipkin
-  
+
   inventory-service:
     networks:
       - msa-network
     image: localhost/local/inventory-service
     container_name: inventory-service
+    ports:
+      - "8083:8083"
     environment:
       - ZIPKIN_URL=http://zipkin:9411
       - EUREKA_SERVER_URL=http://discovery-server:8761/eureka
@@ -152,7 +157,7 @@ services:
       - discovery-server
       - kafka
       - zipkin
-  
+
   inventory-mysql:
     networks:
       - msa-network
