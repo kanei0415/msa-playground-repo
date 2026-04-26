@@ -2,6 +2,8 @@ version: '3.8'
 
 services:
   kafka:
+    networks:
+      - msa-network
     image: docker.io/apache/kafka:4.2.0
     container_name: broker
     ports:
@@ -17,50 +19,60 @@ services:
       CLUSTER_ID: '5L6g3nShT-eMCtK--X86sw'
   
   zipkin:
+    networks:
+      - msa-network
     image: docker.io/openzipkin/zipkin:3.6.1
     container_name: zipkin
     ports:
       - "9411:9411"
 
   discovery-server:
+    networks:
+      - msa-network
     image: localhost/local/discovery-server
     container_name: discovery-server
     ports:
       - "8761:8761"
     environment:
-      - EUREKA_SERVER_URL=http://localhost:8761/eureka
-      - ZIPKIN_URL=http://localhost:9411
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka
+      - ZIPKIN_URL=http://zipkin:9411
       - SERVER_PORT=8761
     depends_on:
       - zipkin
   
   api-gateway:
+    networks:
+      - msa-network
     image: localhost/local/api-gateway
     container_name: api-gateway
     ports:
       - "8080:8080"
     environment:
-      - EUREKA_SERVER_URL=http://localhost:8761/eureka
-      - EUREKA_SERVER_HOST=http://localhost:8761
-      - ZIPKIN_URL=http://localhost:9411
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka
+      - EUREKA_SERVER_HOST=http://discovery-server:8761
+      - ZIPKIN_URL=http://zipkin:9411
       - SERVER_PORT=8080
     depends_on:
       - discovery-server
       - zipkin
   
   product-service:
+    networks:
+      - msa-network
     image: localhost/local/product-service
     container_name: product-service
     environment:
-      - ZIPKIN_URL=http://localhost:9411
+      - ZIPKIN_URL=http://zipkin:9411
       - MONGO_DATABASE=productdb
       - MONGO_USER=username
       - MONGO_PASSWORD=password
-      - MONGO_HOST=localhost:27017
+      - MONGO_HOST=mongo:27017
     depends_on:
       - mongo
       - zipkin
   mongo:
+    networks:
+      - msa-network
     image: docker.io/library/mongo:8.2.7
     container_name: mongo
     ports:
@@ -71,19 +83,21 @@ services:
       MONGO_INITDB_DATABASE: productdb
 
   order-service:
+    networks:
+      - msa-network
     image: localhost/local/order-service
     container_name: order-service
     ports:
       - "8081:8081"
     environment:
-      - ZIPKIN_URL=http://localhost:9411
-      - EUREKA_SERVER_URL=http://localhost:8761/eureka
-      - KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+      - ZIPKIN_URL=http://zipkin:9411
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - SERVER_PORT=8081
       - MYSQL_DATABASE=order-service
       - MYSQL_USER=username
       - MYSQL_PASSWORD=password
-      - MYSQL_HOST=localhost:3306
+      - MYSQL_HOST=order-mysql:3306
     depends_on:
       - order-mysql
       - discovery-server
@@ -91,6 +105,8 @@ services:
       - zipkin
       
   order-mysql:
+    networks:
+      - msa-network
     image: docker.io/library/mysql:9.7.0
     container_name: order-mysql
     ports:
@@ -102,28 +118,32 @@ services:
       MYSQL_PASSWORD: password
 
   notification-service:
+    networks:
+      - msa-network
     image: localhost/local/notification-service
     container_name: notification-service
     environment:
-      - ZIPKIN_URL=http://localhost:9411
-      - EUREKA_SERVER_URL=http://eureka:password@localhost:8761/eureka
-      - KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+      - ZIPKIN_URL=http://zipkin:9411
+      - EUREKA_SERVER_URL=http://eureka:password@discovery-server:8761/eureka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - discovery-server
       - kafka
       - zipkin
   
   inventory-service:
+    networks:
+      - msa-network
     image: localhost/local/inventory-service
     container_name: inventory-service
     environment:
-      - ZIPKIN_URL=http://localhost:9411
-      - EUREKA_SERVER_URL=http://localhost:8761/eureka
-      - KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+      - ZIPKIN_URL=http://zipkin:9411
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - MYSQL_DATABASE=inventory-service
       - MYSQL_USER=username
       - MYSQL_PASSWORD=password
-      - MYSQL_HOST=localhost:3307
+      - MYSQL_HOST=inventory-mysql:3307
     depends_on:
       - inventory-mysql
       - discovery-server
@@ -131,6 +151,8 @@ services:
       - zipkin
   
   inventory-mysql:
+    networks:
+      - msa-network
     image: docker.io/library/mysql:9.7.0
     container_name: inventory-mysql
     ports:
@@ -140,3 +162,7 @@ services:
       MYSQL_DATABASE: inventory-service
       MYSQL_USER: username
       MYSQL_PASSWORD: password
+
+networks:
+  msa-network:
+    driver: bridge
