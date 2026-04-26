@@ -1,1 +1,1 @@
-bash image_build.sh && podman-compose -f docker-compose.yaml up
+bash /root/msa-playground-repo/image_build.sh && podman-compose -f /root/msa-playground-repo/docker-compose.yaml up
