@@ -97,7 +97,8 @@ services:
       - MYSQL_DATABASE=order-service
       - MYSQL_USER=username
       - MYSQL_PASSWORD=password
-      - MYSQL_HOST=order-mysql:3306
+      - MYSQL_HOST=order-mysql
+      - MYSQL_PORT=3306
     depends_on:
       - order-mysql
       - discovery-server
