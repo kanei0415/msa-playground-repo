@@ -1,0 +1,1 @@
+bash image_build.sh && podman-compose -f docker-compose.yaml up
