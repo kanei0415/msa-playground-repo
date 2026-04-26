@@ -144,7 +144,8 @@ services:
       - MYSQL_DATABASE=inventory-service
       - MYSQL_USER=username
       - MYSQL_PASSWORD=password
-      - MYSQL_HOST=inventory-mysql:3306
+      - MYSQL_HOST=inventory-mysql
+      - MYSQL_PORT=3306
     depends_on:
       - inventory-mysql
       - discovery-server
